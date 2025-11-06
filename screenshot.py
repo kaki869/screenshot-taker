@@ -22,7 +22,7 @@ if __name__ == "__main__":
         screenshot_path = take_screenshot(f'screenshot_{i+1}.png')
         screenshot_paths.append(screenshot_path)
         send_to_discord_webhook(webhook_url, screenshot_path)
-        time.sleep(0.5)
+        time.sleep(3)
 
     for path in screenshot_paths:
         os.remove(path)
